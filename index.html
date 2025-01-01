@@ -77,9 +77,14 @@
       font-size: 16px;
       cursor: pointer;
       margin: 10px;
+      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #45a049;
+    }
+    button.disabled {
+      background-color: gray;
+      cursor: not-allowed;
     }
     .result-animation {
       width: 100px;
@@ -118,8 +123,10 @@
   </div>
   <div id="altar" class="tab">
     <h2>Алтарь</h2>
-    <div id="selected-items"></div>
-    <button id="mix-button">Смешать</button>
+    <div id="selected-items">
+      <!-- Выбранные ингредиенты -->
+    </div>
+    <button id="mix-button" class="disabled" disabled>Смешать</button>
     <div id="mix-result"></div>
   </div>
   <script>
@@ -162,6 +169,7 @@
         element.classList.add('selected');
       }
       renderSelectedItems();
+      updateMixButton();
     }
 
     function renderSelectedItems() {
@@ -175,6 +183,17 @@
       });
     }
 
+    function updateMixButton() {
+      const mixButton = document.getElementById('mix-button');
+      if (selectedItems.length >= 2) {
+        mixButton.classList.remove('disabled');
+        mixButton.disabled = false;
+      } else {
+        mixButton.classList.add('disabled');
+        mixButton.disabled = true;
+      }
+    }
+
     document.getElementById('mix-button').addEventListener('click', () => {
       if (selectedItems.length < 2) {
         alert('Необходимо выбрать минимум 2 ингредиента!');
@@ -182,6 +201,7 @@
       }
       selectedItems.splice(0, selectedItems.length); // Очистка выбора
       renderSelectedItems();
+      updateMixButton();
       const resultDiv = document.getElementById('mix-result');
       resultDiv.innerHTML = '<div class="result-animation"></div>';
       setTimeout(() => {
