@@ -21,43 +21,17 @@
       font-weight: bold;
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
-    nav {
+    .inventory {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
-      margin: 20px 0;
-    }
-    nav button {
-      padding: 10px 20px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    nav button:hover {
-      background-color: #45a049;
-    }
-    .tab {
-      display: none;
       padding: 20px;
-      margin: 20px auto;
-      width: 90%;
-      max-width: 600px;
-      background: #29293d;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    }
-    .tab.active {
-      display: block;
+      gap: 10px;
     }
     .item {
       display: inline-block;
-      margin: 10px;
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       background-size: contain;
       background-repeat: no-repeat;
       cursor: pointer;
@@ -68,146 +42,94 @@
       border-color: gold;
       transform: scale(1.1);
     }
-    button {
-      padding: 10px 20px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 10px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    button.disabled {
-      background-color: gray;
-      cursor: not-allowed;
-    }
-    .result-animation {
-      width: 100px;
-      height: 100px;
-      margin: 20px auto;
-      background-color: rgba(255, 215, 0, 0.8);
-      border-radius: 50%;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
+    .mix-result {
+      margin: 20px;
+      padding: 20px;
+      background: #29293d;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
 <body>
   <header>Алхимическая лаборатория</header>
-  <nav>
-    <button onclick="openTab('inventory')">Инвентарь</button>
-    <button onclick="openTab('tasks')">Задания</button>
-    <button onclick="openTab('altar')">Алтарь</button>
-  </nav>
-  <div id="inventory" class="tab">
-    <h2>Инвентарь</h2>
-    <div id="inventory-items">
-      <!-- Ингредиенты -->
-    </div>
-  </div>
-  <div id="tasks" class="tab">
-    <h2>Задания</h2>
-    <ul>
-      <li>Подпишитесь на Telegram → Получите ингредиент</li>
-      <li>Подпишитесь на Twitter → Получите ингредиент</li>
-    </ul>
-  </div>
-  <div id="altar" class="tab">
-    <h2>Алтарь</h2>
-    <div id="selected-items">
-      <!-- Выбранные ингредиенты -->
-    </div>
-    <button id="mix-button" class="disabled" disabled>Смешать</button>
-    <div id="mix-result"></div>
-  </div>
+  <h2>Инвентарь</h2>
+  <div class="inventory" id="inventory"></div>
+  <button id="mix-button" disabled>Смешать</button>
+  <div id="mix-result" class="mix-result"></div>
   <script>
     const inventory = [
-      { id: 1, name: 'Ингредиент 1', image: 'without background/1.png' },
-      { id: 2, name: 'Ингредиент 2', image: 'without background/2.png' },
-      { id: 3, name: 'Ингредиент 3', image: 'without background/3.png' },
-      { id: 4, name: 'Ингредиент 4', image: 'without background/4.png' },
+      { name: 'Капля Воды', image: 'without background/1.png', count: 2 },
+      { name: 'Искра Огня', image: 'without background/2.png', count: 2 },
+      { name: 'Семя Жизни', image: 'without background/3.png', count: 2 },
+      { name: 'Осколок Камня', image: 'without background/4.png', count: 2 },
+      { name: 'Дуновение Ветра', image: 'without background/5.png', count: 2 },
     ];
-    const selectedItems = [];
-    const maxSelection = 4;
 
-    function openTab(tabId) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-    }
+    const recipes = {
+      'Кристалл Льда': { ingredients: ['Капля Воды', 'Дуновение Ветра'], image: 'without background/ice.png' },
+      'Свет Солнца': { ingredients: ['Искра Огня', 'Семя Жизни'], image: 'without background/sun.png' },
+      'Росток Надежды': { ingredients: ['Семя Жизни', 'Капля Воды'], image: 'without background/sprout.png' },
+      'Искра Молнии': { ingredients: ['Дуновение Ветра', 'Искра Огня'], image: 'without background/lightning.png' },
+      'Глина Земли': { ingredients: ['Осколок Камня', 'Капля Воды'], image: 'without background/clay.png' },
+    };
+
+    const selectedItems = [];
 
     function renderInventory() {
-      const inventoryDiv = document.getElementById('inventory-items');
+      const inventoryDiv = document.getElementById('inventory');
       inventoryDiv.innerHTML = '';
-      inventory.forEach(item => {
+      inventory.forEach((item, index) => {
         const itemDiv = document.createElement('div');
-        itemDiv.className = `item ${selectedItems.includes(item) ? 'selected' : ''}`;
+        itemDiv.className = `item ${selectedItems.includes(index) ? 'selected' : ''}`;
         itemDiv.style.backgroundImage = `url('${item.image}')`;
-        itemDiv.addEventListener('click', () => selectItem(item, itemDiv));
+        itemDiv.title = `${item.name} (${item.count})`;
+        itemDiv.addEventListener('click', () => selectItem(index));
         inventoryDiv.appendChild(itemDiv);
       });
     }
 
-    function selectItem(item, element) {
-      if (selectedItems.includes(item)) {
-        selectedItems.splice(selectedItems.indexOf(item), 1);
-        element.classList.remove('selected');
-      } else {
-        if (selectedItems.length >= maxSelection) {
-          alert('Можно выбрать до 4 ингредиентов!');
-          return;
+    function selectItem(index) {
+      const selectedIndex = selectedItems.indexOf(index);
+      if (selectedIndex >= 0) {
+        selectedItems.splice(selectedIndex, 1);
+      } else if (selectedItems.length < 2) {
+        selectedItems.push(index);
+      }
+      document.getElementById('mix-button').disabled = selectedItems.length < 2;
+      renderInventory();
+    }
+
+    function mixItems() {
+      if (selectedItems.length < 2) return;
+      const selected = selectedItems.map(index => inventory[index].name);
+      let result = null;
+
+      for (const [name, recipe] of Object.entries(recipes)) {
+        if (recipe.ingredients.every(ingredient => selected.includes(ingredient))) {
+          result = { name, image: recipe.image };
+          break;
         }
-        selectedItems.push(item);
-        element.classList.add('selected');
       }
-      renderSelectedItems();
-      updateMixButton();
-    }
 
-    function renderSelectedItems() {
-      const selectedDiv = document.getElementById('selected-items');
-      selectedDiv.innerHTML = '';
-      selectedItems.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'item';
-        itemDiv.style.backgroundImage = `url('${item.image}')`;
-        selectedDiv.appendChild(itemDiv);
-      });
-    }
-
-    function updateMixButton() {
-      const mixButton = document.getElementById('mix-button');
-      if (selectedItems.length >= 2) {
-        mixButton.classList.remove('disabled');
-        mixButton.disabled = false;
-      } else {
-        mixButton.classList.add('disabled');
-        mixButton.disabled = true;
-      }
-    }
-
-    document.getElementById('mix-button').addEventListener('click', () => {
-      if (selectedItems.length < 2) {
-        alert('Необходимо выбрать минимум 2 ингредиента!');
-        return;
-      }
-      selectedItems.splice(0, selectedItems.length); // Очистка выбора
-      renderSelectedItems();
-      updateMixButton();
       const resultDiv = document.getElementById('mix-result');
-      resultDiv.innerHTML = '<div class="result-animation"></div>';
-      setTimeout(() => {
-        resultDiv.innerHTML = 'Вы создали новую жидкость!';
-      }, 2000);
-    });
+      if (result) {
+        resultDiv.innerHTML = `<h3>Создано: ${result.name}</h3><img src="${result.image}" alt="${result.name}" style="width:100px;">`;
+        selectedItems.forEach(index => {
+          inventory[index].count--;
+          if (inventory[index].count === 0) inventory.splice(index, 1);
+        });
+        inventory.push({ name: result.name, image: result.image, count: 1 });
+      } else {
+        resultDiv.innerHTML = '<h3>Ингредиенты не смешиваются!</h3>';
+      }
+
+      selectedItems.length = 0;
+      renderInventory();
+      document.getElementById('mix-button').disabled = true;
+    }
+
+    document.getElementById('mix-button').addEventListener('click', mixItems);
 
     renderInventory();
   </script>
