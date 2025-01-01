@@ -3,41 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Алхимический Таппер</title>
+  <title>Алхимическая лаборатория</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      text-align: center;
       margin: 0;
       padding: 0;
-      background-color: #f3f4f6;
+      background-color: #1e1e2f;
+      color: white;
+      text-align: center;
     }
     header {
-      background-color: #4caf50;
-      color: white;
-      padding: 20px 0;
+      background-color: #6a5acd;
+      padding: 20px;
       font-size: 24px;
       font-weight: bold;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
     .container {
       padding: 20px;
     }
-    .task {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin: 10px auto;
-      padding: 15px;
-      max-width: 400px;
+    .inventory {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
     }
-    .task h3 {
-      font-size: 18px;
-      margin: 0 0 10px 0;
-      color: #333;
+    .flask {
+      position: relative;
+      width: 100px;
+      height: 150px;
+      background: url('https://via.placeholder.com/100x150') no-repeat center;
+      background-size: contain;
+      animation: float 3s ease-in-out infinite;
     }
-    .task button {
-      padding: 10px 15px;
+    .liquid {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(to top, #4caf50, #66bb6a);
+      border-radius: 0 0 50% 50%;
+      animation: bubble 2s infinite;
+    }
+    .actions {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
       background-color: #4caf50;
       color: white;
       border: none;
@@ -46,61 +61,61 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-    .task button:hover {
+    button:hover {
       background-color: #45a049;
     }
-    footer {
-      margin-top: 20px;
-      color: #777;
-      font-size: 14px;
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes bubble {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-20px); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <header>
-    Алхимический Таппер
-  </header>
+  <header>Алхимическая лаборатория</header>
   <div class="container">
-    <div id="status" class="task">
-      <h3>Ваши текущие эссенции: <span id="essence-count">0</span></h3>
-      <button id="collect-btn">Собрать эссенцию</button>
+    <div class="inventory" id="inventory">
+      <!-- Колбы добавляются динамически -->
     </div>
-    <div id="daily-task" class="task">
-      <h3>Ежедневное задание:</h3>
-      <p>Соберите 10 эссенций сегодня!</p>
-      <button id="complete-task-btn">Выполнить</button>
+    <div class="actions">
+      <button id="combine-btn">Смешать колбы</button>
     </div>
   </div>
-  <footer>
-    &copy; 2025 Алхимический Таппер. Все права защищены.
-  </footer>
   <script>
-    let essenceCount = 0;
+    const inventory = [
+      { id: 1, color: 'linear-gradient(to top, #4caf50, #66bb6a)' },
+      { id: 2, color: 'linear-gradient(to top, #ff5722, #ff8a65)' }
+    ];
 
-    const essenceCountElem = document.getElementById('essence-count');
-    const collectBtn = document.getElementById('collect-btn');
-    const completeTaskBtn = document.getElementById('complete-task-btn');
+    function renderInventory() {
+      const inventoryDiv = document.getElementById('inventory');
+      inventoryDiv.innerHTML = '';
+      inventory.forEach((flask, index) => {
+        const flaskDiv = document.createElement('div');
+        flaskDiv.className = 'flask';
+        flaskDiv.innerHTML = `<div class="liquid" style="background: ${flask.color}"></div>`;
+        flaskDiv.addEventListener('click', () => alert(`Колба ${index + 1} выбрана!`));
+        inventoryDiv.appendChild(flaskDiv);
+      });
+    }
 
-    collectBtn.addEventListener('click', () => {
-      essenceCount++;
-      essenceCountElem.textContent = essenceCount;
-      if (essenceCount >= 10) {
-        completeTaskBtn.disabled = false;
+    document.getElementById('combine-btn').addEventListener('click', () => {
+      if (inventory.length < 2) {
+        alert('Не хватает колб для смешивания!');
+        return;
       }
+      // Удаляем две колбы и добавляем новую
+      inventory.splice(0, 2);
+      inventory.push({ id: 3, color: 'linear-gradient(to top, #8e44ad, #9b59b6)' });
+      alert('Вы создали новую колбу!');
+      renderInventory();
     });
 
-    completeTaskBtn.addEventListener('click', () => {
-      if (essenceCount >= 10) {
-        alert('Вы успешно выполнили задание и получаете бонус!');
-        essenceCount -= 10;
-        essenceCountElem.textContent = essenceCount;
-        completeTaskBtn.disabled = true;
-      } else {
-        alert('Соберите больше эссенций, чтобы выполнить задание!');
-      }
-    });
-
-    completeTaskBtn.disabled = true;
+    renderInventory();
   </script>
 </body>
 </html>
