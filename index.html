@@ -21,11 +21,35 @@
       font-weight: bold;
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
-    .inventory {
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      gap: 20px;
+    }
+    .tabs button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .tabs button:hover {
+      background-color: #45a049;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .inventory, .recipes {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      padding: 20px;
       gap: 10px;
     }
     .item {
@@ -42,7 +66,7 @@
       border-color: gold;
       transform: scale(1.1);
     }
-    .mix-result {
+    #mix-result {
       margin: 20px;
       padding: 20px;
       background: #29293d;
@@ -53,28 +77,84 @@
 </head>
 <body>
   <header>Алхимическая лаборатория</header>
-  <h2>Инвентарь</h2>
-  <div class="inventory" id="inventory"></div>
-  <button id="mix-button" disabled>Смешать</button>
-  <div id="mix-result" class="mix-result"></div>
+  <div class="tabs">
+    <button onclick="openTab('inventory-tab')">Инвентарь</button>
+    <button onclick="openTab('recipes-tab')">Рецепты</button>
+  </div>
+  <div id="inventory-tab" class="tab-content active">
+    <h2>Инвентарь</h2>
+    <div class="inventory" id="inventory"></div>
+    <button id="mix-button" disabled>Смешать</button>
+    <div id="mix-result"></div>
+  </div>
+  <div id="recipes-tab" class="tab-content">
+    <h2>Созданные Рецепты</h2>
+    <div class="recipes" id="recipes"></div>
+  </div>
   <script>
     const inventory = [
-      { name: 'Капля Воды', image: 'without background/1.png', count: 2 },
-      { name: 'Искра Огня', image: 'without background/2.png', count: 2 },
-      { name: 'Семя Жизни', image: 'without background/3.png', count: 2 },
-      { name: 'Осколок Камня', image: 'without background/4.png', count: 2 },
-      { name: 'Дуновение Ветра', image: 'without background/5.png', count: 2 },
+      { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_1.png', count: 2 },
+      { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_2.png', count: 2 },
+      { name: 'Семя Жизни', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_3.png', count: 2 },
+      { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_4.png', count: 2 },
+      { name: 'Дуновение Ветра', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_5.png', count: 2 },
+      { name: 'Кристалл Льда', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_6.png', count: 2 },
+      { name: 'Свет Солнца', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_7.png', count: 2 },
+      { name: 'Глина Земли', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_8.png', count: 2 },
+      { name: 'Искра Молнии', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_9.png', count: 2 },
+      { name: 'Росток Надежды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_10.png', count: 2 }
     ];
 
     const recipes = {
-      'Кристалл Льда': { ingredients: ['Капля Воды', 'Дуновение Ветра'], image: 'without background/ice.png' },
-      'Свет Солнца': { ingredients: ['Искра Огня', 'Семя Жизни'], image: 'without background/sun.png' },
-      'Росток Надежды': { ingredients: ['Семя Жизни', 'Капля Воды'], image: 'without background/sprout.png' },
-      'Искра Молнии': { ingredients: ['Дуновение Ветра', 'Искра Огня'], image: 'without background/lightning.png' },
-      'Глина Земли': { ingredients: ['Осколок Камня', 'Капля Воды'], image: 'without background/clay.png' },
+      'Жемчужина Воды': {
+        ingredients: ['Капля Воды', 'Кристалл Льда'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_11.png'
+      },
+      'Магма Земли': {
+        ingredients: ['Искра Огня', 'Осколок Камня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_12.png'
+      },
+      'Буря': {
+        ingredients: ['Дуновение Ветра', 'Искра Молнии'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_13.png'
+      },
+      'Огненное Сердце': {
+        ingredients: ['Свет Солнца', 'Искра Огня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_14.png'
+      },
+      'Ядро Земли': {
+        ingredients: ['Глина Земли', 'Осколок Камня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_15.png'
+      },
+      'Цветок Жизни': {
+        ingredients: ['Росток Надежды', 'Семя Жизни'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_16.png'
+      },
+      'Философский Камень': {
+        ingredients: ['Ядро Земли', 'Жемчужина Воды'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_17.png'
+      },
+      'Сияние Эфира': {
+        ingredients: ['Буря', 'Свет Солнца'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_18.png'
+      },
+      'Алхимическая Сфера': {
+        ingredients: ['Философский Камень', 'Цветок Жизни'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_19.png'
+      },
+      'Эликсир Мудрости': {
+        ingredients: ['Алхимическая Сфера', 'Жемчужина Воды'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_20.png'
+      }
     };
 
+    const createdRecipes = [];
     const selectedItems = [];
+
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
 
     function renderInventory() {
       const inventoryDiv = document.getElementById('inventory');
@@ -89,11 +169,23 @@
       });
     }
 
+    function renderRecipes() {
+      const recipesDiv = document.getElementById('recipes');
+      recipesDiv.innerHTML = '';
+      createdRecipes.forEach(recipe => {
+        const recipeDiv = document.createElement('div');
+        recipeDiv.className = 'item';
+        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
+        recipeDiv.title = recipe.name;
+        recipesDiv.appendChild(recipeDiv);
+      });
+    }
+
     function selectItem(index) {
       const selectedIndex = selectedItems.indexOf(index);
       if (selectedIndex >= 0) {
         selectedItems.splice(selectedIndex, 1);
-      } else if (selectedItems.length < 2) {
+      } else if (selectedItems.length < 4) {
         selectedItems.push(index);
       }
       document.getElementById('mix-button').disabled = selectedItems.length < 2;
@@ -115,11 +207,13 @@
       const resultDiv = document.getElementById('mix-result');
       if (result) {
         resultDiv.innerHTML = `<h3>Создано: ${result.name}</h3><img src="${result.image}" alt="${result.name}" style="width:100px;">`;
+        createdRecipes.push(result);
         selectedItems.forEach(index => {
           inventory[index].count--;
           if (inventory[index].count === 0) inventory.splice(index, 1);
         });
         inventory.push({ name: result.name, image: result.image, count: 1 });
+        renderRecipes();
       } else {
         resultDiv.innerHTML = '<h3>Ингредиенты не смешиваются!</h3>';
       }
