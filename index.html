@@ -53,9 +53,6 @@
     .tab.active {
       display: block;
     }
-    .inventory, .tasks, .altar {
-      margin-bottom: 20px;
-    }
     .item {
       display: inline-block;
       margin: 10px;
@@ -65,9 +62,11 @@
       background-repeat: no-repeat;
       cursor: pointer;
       border: 2px solid transparent;
+      transition: border-color 0.3s, transform 0.2s;
     }
     .item.selected {
       border-color: gold;
+      transform: scale(1.1);
     }
     button {
       padding: 10px 20px;
@@ -143,22 +142,26 @@
       inventoryDiv.innerHTML = '';
       inventory.forEach(item => {
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'item';
+        itemDiv.className = `item ${selectedItems.includes(item) ? 'selected' : ''}`;
         itemDiv.style.backgroundImage = `url('${item.image}')`;
-        itemDiv.addEventListener('click', () => selectItem(item));
+        itemDiv.addEventListener('click', () => selectItem(item, itemDiv));
         inventoryDiv.appendChild(itemDiv);
       });
     }
 
-    function selectItem(item) {
-      if (selectedItems.length >= maxSelection) {
-        alert('Можно выбрать до 4 ингредиентов!');
-        return;
-      }
-      if (!selectedItems.includes(item)) {
+    function selectItem(item, element) {
+      if (selectedItems.includes(item)) {
+        selectedItems.splice(selectedItems.indexOf(item), 1);
+        element.classList.remove('selected');
+      } else {
+        if (selectedItems.length >= maxSelection) {
+          alert('Можно выбрать до 4 ингредиентов!');
+          return;
+        }
         selectedItems.push(item);
-        renderSelectedItems();
+        element.classList.add('selected');
       }
+      renderSelectedItems();
     }
 
     function renderSelectedItems() {
