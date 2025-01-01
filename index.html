@@ -144,36 +144,48 @@
       const createdDiv = document.getElementById('created-inventory');
 
       basicDiv.innerHTML = '';
-      basicInventory.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `item ${selectedItems.includes(`basic-${index}`) ? 'selected' : ''}`;
-        itemDiv.style.backgroundImage = `url('${item.image}')`;
-        itemDiv.title = `${item.name} (${item.count})`;
-        itemDiv.addEventListener('click', () => selectItem(`basic-${index}`));
-        basicDiv.appendChild(itemDiv);
-      });
+      if (basicInventory.length === 0) {
+        basicDiv.innerHTML = '<p>Нет простых ингредиентов</p>';
+      } else {
+        basicInventory.forEach((item, index) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = `item ${selectedItems.includes(`basic-${index}`) ? 'selected' : ''}`;
+          itemDiv.style.backgroundImage = `url('${item.image}')`;
+          itemDiv.title = `${item.name} (${item.count})`;
+          itemDiv.addEventListener('click', () => selectItem(`basic-${index}`));
+          basicDiv.appendChild(itemDiv);
+        });
+      }
 
       createdDiv.innerHTML = '';
-      createdInventory.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `item ${selectedItems.includes(`created-${index}`) ? 'selected' : ''}`;
-        itemDiv.style.backgroundImage = `url('${item.image}')`;
-        itemDiv.title = `${item.name} (${item.count})`;
-        itemDiv.addEventListener('click', () => selectItem(`created-${index}`));
-        createdDiv.appendChild(itemDiv);
-      });
+      if (createdInventory.length === 0) {
+        createdDiv.innerHTML = '<p>Нет созданных ингредиентов</p>';
+      } else {
+        createdInventory.forEach((item, index) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = `item ${selectedItems.includes(`created-${index}`) ? 'selected' : ''}`;
+          itemDiv.style.backgroundImage = `url('${item.image}')`;
+          itemDiv.title = `${item.name} (${item.count})`;
+          itemDiv.addEventListener('click', () => selectItem(`created-${index}`));
+          createdDiv.appendChild(itemDiv);
+        });
+      }
     }
 
     function renderRecipes() {
       const recipesDiv = document.getElementById('recipes');
       recipesDiv.innerHTML = '';
-      createdRecipes.forEach(recipe => {
-        const recipeDiv = document.createElement('div');
-        recipeDiv.className = 'item';
-        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
-        recipeDiv.title = recipe.name;
-        recipesDiv.appendChild(recipeDiv);
-      });
+      if (createdRecipes.length === 0) {
+        recipesDiv.innerHTML = '<p>Нет созданных рецептов</p>';
+      } else {
+        createdRecipes.forEach(recipe => {
+          const recipeDiv = document.createElement('div');
+          recipeDiv.className = 'item';
+          recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
+          recipeDiv.title = recipe.name;
+          recipesDiv.appendChild(recipeDiv);
+        });
+      }
     }
 
     function selectItem(id) {
