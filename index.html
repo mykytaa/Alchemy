@@ -63,41 +63,36 @@
     .tab-content.active {
       display: block;
     }
-    .inventory {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-    .item {
-      display: inline-block;
-      width: 20vw;
-      height: 20vw;
-      max-width: 80px;
-      max-height: 80px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.3s, transform 0.2s;
-    }
-    .item.selected {
-      border-color: gold;
-      transform: scale(1.1);
-    }
-    .farm-model {
+    .interactive-object {
       margin: 20px auto;
-      width: 50vw;
-      height: 50vw;
-      max-width: 200px;
-      max-height: 200px;
-      background: url('https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/Alchemy1_17.png') no-repeat center;
+      width: 200px;
+      height: 200px;
+      background: url('https://raw.githubusercontent.com/mykytaa/Alchemy/main/chan.webp') no-repeat center;
       background-size: contain;
       cursor: pointer;
-      transition: transform 0.1s;
+      animation: glow 1s infinite alternate;
     }
-    .farm-model:active {
-      transform: scale(0.9);
+    .interactive-object:active {
+      animation: pulse 0.2s ease-in-out;
+    }
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+      }
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(0.95);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
     .tap-animation {
       position: absolute;
@@ -117,6 +112,26 @@
         transform: translateY(-50px);
       }
     }
+    .inventory {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .item {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+    .item.selected {
+      border-color: gold;
+      transform: scale(1.1);
+    }
     #mix-result {
       margin: 20px;
       padding: 20px;
@@ -129,18 +144,6 @@
       font-size: 18px;
       margin-bottom: 10px;
     }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul li {
-      margin: 10px 0;
-      font-size: 14px;
-    }
-    button {
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -149,7 +152,7 @@
     <div id="tap-display">Нажатий: 0</div>
   </header>
   <div id="farm-tab" class="tab-content active">
-    <div class="farm-model" onclick="tapModel(event)"></div>
+    <div class="interactive-object" onclick="tapObject(event)"></div>
   </div>
   <div id="inventory-tab" class="tab-content">
     <h2>Инвентарь</h2>
@@ -180,19 +183,49 @@
     <button onclick="switchTab('shop-tab')">Магазин</button>
   </div>
   <script>
+    let tapCount = 0;
     const inventory = [
       { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/1.png', count: 2 },
-      { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/2.png', count: 2 }
+      { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/2.png', count: 2 },
+      { name: 'Семя Земли', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/3.png', count: 2 },
+      { name: 'Песок Времени', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 },
+      { name: 'Солнечный Свет', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/5.png', count: 2 },
+      { name: 'Облако', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/6.png', count: 2 },
+      { name: 'Камень Луны', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/7.png', count: 2 },
+      { name: 'Иней', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/8.png', count: 2 },
+      { name: 'Листик', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/9.png', count: 2 },
+      { name: 'Ягода', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/10.png', count: 2 }
     ];
 
-    let tapCount = 0;
+    const recipes = {
+      'Жемчужина Воды': {
+        ingredients: ['Капля Воды', 'Искра Огня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/11.png'
+      },
+      'Магма Земли': {
+        ingredients: ['Семя Земли', 'Искра Огня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/12.png'
+      },
+      'Лист Огня': {
+        ingredients: ['Листик', 'Искра Огня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/13.png'
+      },
+      'Лунный Камень': {
+        ingredients: ['Камень Луны', 'Песок Времени'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/14.png'
+      },
+      'Солнечное Облако': {
+        ingredients: ['Солнечный Свет', 'Облако'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/15.png'
+      }
+    };
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
     }
 
-    function tapModel(event) {
+    function tapObject(event) {
       tapCount++;
       document.getElementById('tap-display').innerText = `Нажатий: ${tapCount}`;
 
@@ -220,7 +253,21 @@
       });
     }
 
+    function renderRecipes() {
+      const recipesDiv = document.getElementById('recipes');
+      recipesDiv.innerHTML = '';
+      Object.keys(recipes).forEach(recipeName => {
+        const recipe = recipes[recipeName];
+        const recipeDiv = document.createElement('div');
+        recipeDiv.className = 'item';
+        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
+        recipeDiv.title = `${recipeName}: ${recipe.ingredients.join(', ')}`;
+        recipesDiv.appendChild(recipeDiv);
+      });
+    }
+
     renderInventory();
+    renderRecipes();
   </script>
 </body>
 </html>
