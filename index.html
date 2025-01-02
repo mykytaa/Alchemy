@@ -167,7 +167,7 @@
       transition: border-color 0.3s, transform 0.2s;
     }
     .item.selected {
-      border-color: gold;
+      border-color: #b8860b;
       transform: scale(1.1);
     }
     .item:hover {
@@ -201,7 +201,7 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #4caf50, #81c784);
-      transition: width 0.5s ease;
+      transition: width 1s ease;
     }
   </style>
 </head>
@@ -255,9 +255,11 @@
 
     async function connectWallet() {
       try {
-        const walletData = Telegram.WebApp.initData || '';
+        const walletData = Telegram.WebApp.initDataUnsafe;
         if (walletData) {
-          document.getElementById('connect-wallet').innerText = `Кошелек: ${walletData.slice(0, 6)}...${walletData.slice(-4)}`;
+          const params = new URLSearchParams(walletData);
+          const userId = params.get('user') || 'undefined';
+          document.getElementById('connect-wallet').innerText = `Кошелек: ${userId}`;
         } else {
           alert('Ошибка: Проверьте настройки Telegram WebApp!');
         }
@@ -291,8 +293,13 @@
 
     function updateProgress() {
       const progress = document.getElementById('progress');
-      const percentage = (tapCount % 100) + '%';
+      const percentage = (tapCount % 200) / 2 + '%';
       progress.style.width = percentage;
+
+      if (percentage === '100%') {
+        tapCount *= 2;
+        document.getElementById('tap-display').innerText = `Нажатий: ${tapCount}`;
+      }
     }
 
     function renderInventory() {
@@ -303,14 +310,47 @@
         itemDiv.className = 'item';
         itemDiv.style.backgroundImage = `url('${item.image}')`;
         itemDiv.title = `${item.name} (${item.count})`;
-        itemDiv.addEventListener('click', () => selectItem(itemDiv));
+        itemDiv.addEventListener('click', () => selectItemForMixing(item));
         inventoryDiv.appendChild(itemDiv);
       });
     }
 
-    function selectItem(element) {
-      document.querySelectorAll('.item').forEach(item => item.classList.remove('selected'));
-      element.classList.add('selected');
+    const selectedForMix = [];
+
+    function selectItemForMixing(item) {
+      if (selectedForMix.includes(item)) {
+        selectedForMix.splice(selectedForMix.indexOf(item), 1);
+      } else if (selectedForMix.length < 4) {
+        selectedForMix.push(item);
+      } else {
+        alert('Максимум 4 ингредиента для смешивания!');
+      }
+      document.querySelectorAll('.item').forEach(el => {
+        el.classList.remove('selected');
+      });
+      selectedForMix.forEach(selectedItem => {
+        const el = Array.from(document.querySelectorAll('.item')).find(
+          element => element.title.startsWith(selectedItem.name)
+        );
+        if (el) el.classList.add('selected');
+      });
+    }
+
+    function mixItems() {
+      if (selectedForMix.length < 2) {
+        alert('Выберите минимум 2 ингредиента для смешивания!');
+        return;
+      }
+      const newItemName = selectedForMix.map(item => item.name).join(' + ');
+      const newItem = {
+        name: newItemName,
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/new-item.png',
+        count: 1
+      };
+      inventory.push(newItem);
+      selectedForMix.length = 0;
+      renderInventory();
+      document.getElementById('mix-result').innerText = `Создано: ${newItem.name}`;
     }
 
     renderInventory();
