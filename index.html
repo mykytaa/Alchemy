@@ -103,10 +103,10 @@
   </div>
   <script>
     const basicInventory = [
-      { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/1.png', count: 2 },
-      { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/2.png', count: 2 },
-      { name: 'Семя Жизни', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/3.png', count: 2 },
-      { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/4.png', count: 2 }
+      { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/1.png', count: 2 },
+      { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/2.png', count: 2 },
+      { name: 'Семя Жизни', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/3.png', count: 2 },
+      { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 }
     ];
 
     const createdInventory = [];
@@ -115,19 +115,19 @@
     const recipes = {
       'Жемчужина Воды': {
         ingredients: ['Капля Воды', 'Осколок Камня'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`
+        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
       },
       'Магма Земли': {
         ingredients: ['Искра Огня', 'Семя Жизни'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`
+        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
       },
       'Буря': {
         ingredients: ['Искра Огня', 'Капля Воды'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`
+        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
       },
       'Цветок Жизни': {
         ingredients: ['Семя Жизни', 'Осколок Камня'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`
+        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
       }
     };
 
@@ -226,8 +226,8 @@
           if (inventory[index].count === 0) inventory.splice(index, 1);
         });
         const newImage = recipeCounter <= 50
-          ? `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`
-          : `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`;
+          ? `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
+          : `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`;
         createdInventory.push({ name: result.name, image: newImage, count: 1 });
         renderRecipes();
       } else {
