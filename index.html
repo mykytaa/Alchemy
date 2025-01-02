@@ -10,17 +10,19 @@
       font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #1e1e2f;
+      background: linear-gradient(135deg, #2b1055, #7597de);
       color: white;
       text-align: center;
+      overflow-x: hidden;
     }
     header {
-      background-color: #6a5acd;
+      background: linear-gradient(90deg, #6a5acd, #8360c3);
       padding: 20px;
       font-size: 24px;
       font-weight: bold;
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
       position: relative;
+      border-bottom: 2px solid #8360c3;
     }
     #tap-display {
       position: absolute;
@@ -33,25 +35,27 @@
       position: fixed;
       bottom: 0;
       width: 100%;
-      background-color: #29293d;
+      background: rgba(0, 0, 0, 0.7);
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      border-top: 2px solid #6a5acd;
+      border-top: 2px solid #8360c3;
       z-index: 10;
     }
     .tabs button {
       flex: 1;
       padding: 10px;
-      background-color: transparent;
+      background: none;
       color: white;
       border: none;
       cursor: pointer;
       font-size: 14px;
       text-align: center;
+      transition: transform 0.2s, color 0.3s;
     }
     .tabs button:hover {
       color: #4caf50;
+      transform: scale(1.1);
     }
     .tab-content {
       display: none;
@@ -77,10 +81,10 @@
     }
     @keyframes glow {
       from {
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
       }
       to {
-        box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+        box-shadow: 0 0 20px rgba(255, 255, 0, 1);
       }
     }
     @keyframes pulse {
@@ -97,7 +101,7 @@
     .tap-animation {
       position: absolute;
       font-size: 18px;
-      color: #d8ff5d;
+      color: #ffda79;
       font-weight: bold;
       pointer-events: none;
       animation: fadeUp 1s ease-out;
@@ -117,6 +121,10 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
     .item {
       display: inline-block;
@@ -135,14 +143,16 @@
     #mix-result {
       margin: 20px;
       padding: 20px;
-      background: #29293d;
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       font-size: 14px;
+      color: #ffda79;
     }
     h2 {
       font-size: 18px;
       margin-bottom: 10px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
@@ -157,7 +167,7 @@
   <div id="inventory-tab" class="tab-content">
     <h2>Инвентарь</h2>
     <div class="inventory" id="inventory"></div>
-    <button id="mix-button" disabled>Смешать</button>
+    <button id="mix-button" onclick="mixItems()">Смешать</button>
     <div id="mix-result"></div>
   </div>
   <div id="recipes-tab" class="tab-content">
@@ -182,6 +192,7 @@
     <button onclick="switchTab('tasks-tab')">Задания</button>
     <button onclick="switchTab('shop-tab')">Магазин</button>
   </div>
+  <button id="connect-wallet" onclick="connectWallet()">Подключить кошелек Telegram</button>
   <script>
     let tapCount = 0;
     const inventory = [
@@ -198,25 +209,17 @@
     ];
 
     const recipes = {
-      'Жемчужина Воды': {
-        ingredients: ['Капля Воды', 'Искра Огня'],
+      'Эликсир Жизни': {
+        ingredients: ['Капля Воды', 'Искра Огня', 'Семя Земли'],
         image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/11.png'
       },
-      'Магма Земли': {
-        ingredients: ['Семя Земли', 'Искра Огня'],
+      'Камень Времени': {
+        ingredients: ['Песок Времени', 'Камень Луны', 'Солнечный Свет'],
         image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/12.png'
       },
-      'Лист Огня': {
-        ingredients: ['Листик', 'Искра Огня'],
+      'Зелье Морозной Ночи': {
+        ingredients: ['Иней', 'Облако', 'Листик', 'Ягода'],
         image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/13.png'
-      },
-      'Лунный Камень': {
-        ingredients: ['Камень Луны', 'Песок Времени'],
-        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/14.png'
-      },
-      'Солнечное Облако': {
-        ingredients: ['Солнечный Свет', 'Облако'],
-        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/15.png'
       }
     };
 
@@ -264,6 +267,36 @@
         recipeDiv.title = `${recipeName}: ${recipe.ingredients.join(', ')}`;
         recipesDiv.appendChild(recipeDiv);
       });
+    }
+
+    function mixItems() {
+      const selectedItems = inventory.slice(0, 3); // Используем первые 3 ингредиента для сложных рецептов
+      if (selectedItems.length < 3) {
+        alert('Не хватает ингредиентов для сложного смешивания!');
+        return;
+      }
+
+      const newRecipeName = `Сложный Элемент ${Object.keys(recipes).length + 1}`;
+      const newRecipe = {
+        name: newRecipeName,
+        ingredients: selectedItems.map(i => i.name),
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/14.png'
+      };
+      recipes[newRecipeName] = newRecipe;
+      inventory.splice(0, 3); // Удаляем использованные ингредиенты
+      renderInventory();
+      renderRecipes();
+      document.getElementById('mix-result').innerText = `Создано: ${newRecipeName}`;
+    }
+
+    async function connectWallet() {
+      try {
+        const walletData = await Telegram.WebApp.initDataUnsafe;
+        alert(`Кошелек Telegram подключен: ${walletData}`);
+      } catch (error) {
+        alert('Ошибка подключения кошелька Telegram!');
+        console.error(error);
+      }
     }
 
     renderInventory();
