@@ -93,6 +93,10 @@
       margin-top: 20px;
       max-width: 100%;
       box-sizing: border-box;
+      background: linear-gradient(135deg, #6a5acd, #8360c3, #4caf50, #81c784);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s ease infinite;
+      border-radius: 10px;
     }
     .tab-content.active {
       display: block;
@@ -253,6 +257,8 @@
       { name: 'Песок Времени', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 }
     ];
 
+    const recipes = [];
+
     async function connectWallet() {
       try {
         const walletData = Telegram.WebApp.initDataUnsafe;
@@ -315,6 +321,18 @@
       });
     }
 
+    function renderRecipes() {
+      const recipesDiv = document.getElementById('recipes');
+      recipesDiv.innerHTML = '';
+      recipes.forEach(recipe => {
+        const recipeDiv = document.createElement('div');
+        recipeDiv.className = 'item';
+        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
+        recipeDiv.title = recipe.name;
+        recipesDiv.appendChild(recipeDiv);
+      });
+    }
+
     const selectedForMix = [];
 
     function selectItemForMixing(item) {
@@ -348,12 +366,15 @@
         count: 1
       };
       inventory.push(newItem);
+      recipes.push(newItem);
       selectedForMix.length = 0;
       renderInventory();
+      renderRecipes();
       document.getElementById('mix-result').innerText = `Создано: ${newItem.name}`;
     }
 
     renderInventory();
+    renderRecipes();
   </script>
 </body>
 </html>
