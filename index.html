@@ -183,6 +183,9 @@
           recipeDiv.className = 'item';
           recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
           recipeDiv.title = recipe.name;
+          recipeDiv.addEventListener('click', () => {
+            alert(`Рецепт для ${recipe.name}: ${recipes[recipe.name].ingredients.join(' + ')}`);
+          });
           recipesDiv.appendChild(recipeDiv);
         });
       }
@@ -218,17 +221,21 @@
       const resultDiv = document.getElementById('mix-result');
       if (result) {
         resultDiv.innerHTML = `<h3>Создано: ${result.name}</h3><img src="${result.image}" alt="${result.name}" style="width:100px;">`;
-        createdRecipes.push(result);
+
+        const existing = createdInventory.find(item => item.name === result.name);
+        if (existing) {
+          existing.count++;
+        } else {
+          createdInventory.push({ name: result.name, image: result.image, count: 1 });
+        }
+
         selectedItems.forEach(id => {
           const [type, index] = id.split('-');
           const inventory = type === 'basic' ? basicInventory : createdInventory;
           inventory[index].count--;
           if (inventory[index].count === 0) inventory.splice(index, 1);
         });
-        const newImage = recipeCounter <= 50
-          ? `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
-          : `https://raw.githubusercontent.com/mykytaa/Alchemy/main/all%20png/${recipeCounter++}.png`;
-        createdInventory.push({ name: result.name, image: newImage, count: 1 });
+
         renderRecipes();
       } else {
         resultDiv.innerHTML = '<h3>Ингредиенты не смешиваются!</h3>';
