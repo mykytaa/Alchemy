@@ -22,26 +22,35 @@
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
     .tabs {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #29293d;
       display: flex;
-      justify-content: center;
-      margin: 20px 0;
-      gap: 20px;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 2px solid #6a5acd;
+      z-index: 10;
     }
     .tabs button {
-      padding: 10px 20px;
-      background-color: #4caf50;
+      flex: 1;
+      padding: 10px;
+      background-color: transparent;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      font-size: 14px;
+      text-align: center;
     }
     .tabs button:hover {
-      background-color: #45a049;
+      color: #4caf50;
     }
     .tab-content {
       display: none;
       padding: 20px;
+      margin-top: 20px;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .tab-content.active {
       display: block;
@@ -54,8 +63,10 @@
     }
     .item {
       display: inline-block;
-      width: 80px;
-      height: 80px;
+      width: 20vw;
+      height: 20vw;
+      max-width: 80px;
+      max-height: 80px;
       background-size: contain;
       background-repeat: no-repeat;
       cursor: pointer;
@@ -66,66 +77,88 @@
       border-color: gold;
       transform: scale(1.1);
     }
+    .center-model {
+      margin: 20px auto;
+      width: 50vw;
+      height: 50vw;
+      max-width: 200px;
+      max-height: 200px;
+      background: url('https://cdn.jsdelivr.net/gh/yourusername/path-to-model/alchemy-model.gif') no-repeat center;
+      background-size: contain;
+      cursor: pointer;
+    }
     #mix-result {
       margin: 20px;
       padding: 20px;
       background: #29293d;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      font-size: 14px;
     }
-    .center-animation {
-      margin: 20px auto;
-      width: 150px;
-      height: 150px;
-      background: url('https://cdn.jsdelivr.net/gh/yourusername/path-to-alchemy-circle/alchemy-circle.gif') no-repeat center;
-      background-size: contain;
-      cursor: pointer;
-    }
-    .collapsible {
-      background-color: #4caf50;
-      color: white;
-      cursor: pointer;
-      padding: 10px;
-      border: none;
-      text-align: center;
-      outline: none;
+    h2 {
       font-size: 18px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
       margin-bottom: 10px;
     }
-    .collapsible:hover {
-      background-color: #45a049;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
-    .collapsible-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
+    ul li {
+      margin: 10px 0;
+      font-size: 14px;
     }
-    .collapsible-content.active {
-      max-height: 1000px;
+    button {
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <header>Алхимическая лаборатория</header>
-  <div class="center-animation" onclick="alert('Магическая энергия активирована!')"></div>
-  <button class="collapsible" onclick="toggleCollapsible('inventory-content')">Инвентарь</button>
-  <div id="inventory-content" class="collapsible-content">
+  <div class="center-model" onclick="tapModel()"></div>
+  <div id="inventory-tab" class="tab-content active">
+    <h2>Инвентарь</h2>
     <div class="inventory" id="inventory"></div>
     <button id="mix-button" disabled>Смешать</button>
     <div id="mix-result"></div>
   </div>
-  <button class="collapsible" onclick="toggleCollapsible('recipes-content')">Рецепты</button>
-  <div id="recipes-content" class="collapsible-content">
+  <div id="recipes-tab" class="tab-content">
+    <h2>Рецепты</h2>
     <div class="inventory" id="recipes"></div>
+  </div>
+  <div id="progress-tab" class="tab-content">
+    <h2>Прогресс</h2>
+    <p id="tap-count">Количество нажатий: 0</p>
+    <p id="tokens-count">Токены: 0</p>
+  </div>
+  <div id="tasks-tab" class="tab-content">
+    <h2>Задания</h2>
+    <ul>
+      <li>Смешайте 3 уникальных элемента для бонуса.</li>
+      <li>Заработайте 100 токенов через нажатия.</li>
+    </ul>
+  </div>
+  <div id="shop-tab" class="tab-content">
+    <h2>Магазин</h2>
+    <div id="shop-items"></div>
+  </div>
+  <div class="tabs">
+    <button onclick="switchTab('inventory-tab')">Инвентарь</button>
+    <button onclick="switchTab('recipes-tab')">Рецепты</button>
+    <button onclick="switchTab('progress-tab')">Прогресс</button>
+    <button onclick="switchTab('tasks-tab')">Задания</button>
+    <button onclick="switchTab('shop-tab')">Магазин</button>
   </div>
   <script>
     const inventory = [
       { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/1.png', count: 2 },
       { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/2.png', count: 2 },
       { name: 'Семя Жизни', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/3.png', count: 2 },
-      { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 }
+      { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 },
+      { name: 'Листик', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/11.png', count: 2 },
+      { name: 'Камень Луны', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/12.png', count: 2 },
+      { name: 'Песок Времени', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/13.png', count: 2 },
+      { name: 'Солнечный Свет', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/14.png', count: 2 }
     ];
 
     const recipes = {
@@ -137,103 +170,83 @@
         ingredients: ['Искра Огня', 'Семя Жизни'],
         image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/6.png'
       },
-      'Буря': {
-        ingredients: ['Искра Огня', 'Капля Воды'],
-        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/7.png'
+      'Лист Огня': {
+        ingredients: ['Листик', 'Искра Огня'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/15.png'
       },
-      'Цветок Жизни': {
-        ingredients: ['Семя Жизни', 'Осколок Камня'],
-        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/8.png'
+      'Лунный Камень': {
+        ingredients: ['Камень Луны', 'Песок Времени'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/16.png'
+      },
+      'Солнечное Облако': {
+        ingredients: ['Солнечный Свет', 'Капля Воды'],
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/17.png'
       }
     };
 
-    const selectedItems = [];
+    const shopItems = [
+      { name: 'Редкий Элемент', cost: 100, image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/18.png' },
+      { name: 'Уникальный Элемент', cost: 500, image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/19.png' }
+    ];
 
-    function toggleCollapsible(id) {
-      const content = document.getElementById(id);
-      content.classList.toggle('active');
+    let tapCount = 0;
+    let tokens = 0;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function tapModel() {
+      tapCount++;
+      tokens++;
+      document.getElementById('tap-count').innerText = `Количество нажатий: ${tapCount}`;
+      document.getElementById('tokens-count').innerText = `Токены: ${tokens}`;
     }
 
     function renderInventory() {
       const inventoryDiv = document.getElementById('inventory');
       inventoryDiv.innerHTML = '';
-      inventory.forEach((item, index) => {
+      inventory.forEach(item => {
         const itemDiv = document.createElement('div');
-        itemDiv.className = `item ${selectedItems.includes(index) ? 'selected' : ''}`;
+        itemDiv.className = 'item';
         itemDiv.style.backgroundImage = `url('${item.image}')`;
         itemDiv.title = `${item.name} (${item.count})`;
-        itemDiv.addEventListener('click', () => selectItem(index));
         inventoryDiv.appendChild(itemDiv);
       });
     }
 
-    function renderRecipes() {
-      const recipesDiv = document.getElementById('recipes');
-      recipesDiv.innerHTML = '';
-      Object.entries(recipes).forEach(([name, recipe]) => {
-        const recipeDiv = document.createElement('div');
-        recipeDiv.className = 'item';
-        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
-        recipeDiv.title = name;
-        recipeDiv.addEventListener('click', () => {
-          alert(`Рецепт для ${name}: ${recipe.ingredients.join(' + ')}`);
-        });
-        recipesDiv.appendChild(recipeDiv);
+    function renderShop() {
+      const shopDiv = document.getElementById('shop-items');
+      shopDiv.innerHTML = '';
+      shopItems.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        itemDiv.style.backgroundImage = `url('${item.image}')`;
+        itemDiv.title = `${item.name} - ${item.cost} токенов`;
+        itemDiv.addEventListener('click', () => buyItem(item));
+        shopDiv.appendChild(itemDiv);
       });
     }
 
-    function selectItem(index) {
-      const selectedIndex = selectedItems.indexOf(index);
-      if (selectedIndex >= 0) {
-        selectedItems.splice(selectedIndex, 1);
-      } else if (selectedItems.length < 4) {
-        selectedItems.push(index);
-      }
-      document.getElementById('mix-button').disabled = selectedItems.length < 2;
-      renderInventory();
-    }
-
-    function mixItems() {
-      if (selectedItems.length < 2) return;
-
-      const selectedNames = selectedItems.map(index => inventory[index].name);
-      let result = null;
-
-      for (const [name, recipe] of Object.entries(recipes)) {
-        if (recipe.ingredients.every(ingredient => selectedNames.includes(ingredient))) {
-          result = { name, image: recipe.image };
-          break;
-        }
-      }
-
-      const resultDiv = document.getElementById('mix-result');
-      if (result) {
-        resultDiv.innerHTML = `<h3>Создано: ${result.name}</h3><img src="${result.image}" alt="${result.name}" style="width:100px;">`;
-
-        const existing = inventory.find(item => item.name === result.name);
+    function buyItem(item) {
+      if (tokens >= item.cost) {
+        tokens -= item.cost;
+        const existing = inventory.find(i => i.name === item.name);
         if (existing) {
           existing.count++;
         } else {
-          inventory.push({ name: result.name, image: result.image, count: 1 });
+          inventory.push({ name: item.name, image: item.image, count: 1 });
         }
-
-        selectedItems.forEach(index => {
-          inventory[index].count--;
-          if (inventory[index].count === 0) inventory.splice(index, 1);
-        });
+        document.getElementById('tokens-count').innerText = `Токены: ${tokens}`;
+        renderInventory();
       } else {
-        resultDiv.innerHTML = '<h3>Ингредиенты не смешиваются!</h3>';
+        alert('Недостаточно токенов!');
       }
-
-      selectedItems.length = 0;
-      renderInventory();
-      document.getElementById('mix-button').disabled = true;
     }
 
-    document.getElementById('mix-button').addEventListener('click', mixItems);
-
     renderInventory();
-    renderRecipes();
+    renderShop();
   </script>
 </body>
 </html>
