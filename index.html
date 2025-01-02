@@ -46,10 +46,7 @@
     .tab-content.active {
       display: block;
     }
-    .inventory-section {
-      margin-bottom: 20px;
-    }
-    .inventory, .recipes {
+    .inventory {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -76,127 +73,121 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
+    .center-animation {
+      margin: 20px auto;
+      width: 150px;
+      height: 150px;
+      background: url('https://cdn.jsdelivr.net/gh/yourusername/path-to-alchemy-circle/alchemy-circle.gif') no-repeat center;
+      background-size: contain;
+      cursor: pointer;
+    }
+    .collapsible {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      padding: 10px;
+      border: none;
+      text-align: center;
+      outline: none;
+      font-size: 18px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      margin-bottom: 10px;
+    }
+    .collapsible:hover {
+      background-color: #45a049;
+    }
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .collapsible-content.active {
+      max-height: 1000px;
+    }
   </style>
 </head>
 <body>
   <header>Алхимическая лаборатория</header>
-  <div class="tabs">
-    <button onclick="openTab('inventory-tab')">Инвентарь</button>
-    <button onclick="openTab('recipes-tab')">Рецепты</button>
-  </div>
-  <div id="inventory-tab" class="tab-content active">
-    <h2>Инвентарь</h2>
-    <div class="inventory-section">
-      <h3>Простые ингредиенты</h3>
-      <div class="inventory" id="basic-inventory"></div>
-    </div>
-    <div class="inventory-section">
-      <h3>Созданные ингредиенты</h3>
-      <div class="inventory" id="created-inventory"></div>
-    </div>
+  <div class="center-animation" onclick="alert('Магическая энергия активирована!')"></div>
+  <button class="collapsible" onclick="toggleCollapsible('inventory-content')">Инвентарь</button>
+  <div id="inventory-content" class="collapsible-content">
+    <div class="inventory" id="inventory"></div>
     <button id="mix-button" disabled>Смешать</button>
     <div id="mix-result"></div>
   </div>
-  <div id="recipes-tab" class="tab-content">
-    <h2>Созданные Рецепты</h2>
-    <div class="recipes" id="recipes"></div>
+  <button class="collapsible" onclick="toggleCollapsible('recipes-content')">Рецепты</button>
+  <div id="recipes-content" class="collapsible-content">
+    <div class="inventory" id="recipes"></div>
   </div>
   <script>
-    const basicInventory = [
+    const inventory = [
       { name: 'Капля Воды', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/1.png', count: 2 },
       { name: 'Искра Огня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/2.png', count: 2 },
       { name: 'Семя Жизни', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/3.png', count: 2 },
       { name: 'Осколок Камня', image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/4.png', count: 2 }
     ];
 
-    const createdInventory = [];
-    let recipeCounter = 5; // Счётчик для выбора картинок для новых рецептов
-
     const recipes = {
       'Жемчужина Воды': {
         ingredients: ['Капля Воды', 'Осколок Камня'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/5.png'
       },
       'Магма Земли': {
         ingredients: ['Искра Огня', 'Семя Жизни'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/6.png'
       },
       'Буря': {
         ingredients: ['Искра Огня', 'Капля Воды'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/7.png'
       },
       'Цветок Жизни': {
         ingredients: ['Семя Жизни', 'Осколок Камня'],
-        image: `https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/${recipeCounter++}.png`
+        image: 'https://raw.githubusercontent.com/mykytaa/Alchemy/main/without%20background/8.png'
       }
     };
 
-    const createdRecipes = [];
     const selectedItems = [];
 
-    function openTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
+    function toggleCollapsible(id) {
+      const content = document.getElementById(id);
+      content.classList.toggle('active');
     }
 
     function renderInventory() {
-      const basicDiv = document.getElementById('basic-inventory');
-      const createdDiv = document.getElementById('created-inventory');
-
-      basicDiv.innerHTML = '';
-      if (basicInventory.length === 0) {
-        basicDiv.innerHTML = '<p>Нет простых ингредиентов</p>';
-      } else {
-        basicInventory.forEach((item, index) => {
-          const itemDiv = document.createElement('div');
-          itemDiv.className = `item ${selectedItems.includes(`basic-${index}`) ? 'selected' : ''}`;
-          itemDiv.style.backgroundImage = `url('${item.image}')`;
-          itemDiv.title = `${item.name} (${item.count})`;
-          itemDiv.addEventListener('click', () => selectItem(`basic-${index}`));
-          basicDiv.appendChild(itemDiv);
-        });
-      }
-
-      createdDiv.innerHTML = '';
-      if (createdInventory.length === 0) {
-        createdDiv.innerHTML = '<p>Нет созданных ингредиентов</p>';
-      } else {
-        createdInventory.forEach((item, index) => {
-          const itemDiv = document.createElement('div');
-          itemDiv.className = `item ${selectedItems.includes(`created-${index}`) ? 'selected' : ''}`;
-          itemDiv.style.backgroundImage = `url('${item.image}')`;
-          itemDiv.title = `${item.name} (${item.count})`;
-          itemDiv.addEventListener('click', () => selectItem(`created-${index}`));
-          createdDiv.appendChild(itemDiv);
-        });
-      }
+      const inventoryDiv = document.getElementById('inventory');
+      inventoryDiv.innerHTML = '';
+      inventory.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `item ${selectedItems.includes(index) ? 'selected' : ''}`;
+        itemDiv.style.backgroundImage = `url('${item.image}')`;
+        itemDiv.title = `${item.name} (${item.count})`;
+        itemDiv.addEventListener('click', () => selectItem(index));
+        inventoryDiv.appendChild(itemDiv);
+      });
     }
 
     function renderRecipes() {
       const recipesDiv = document.getElementById('recipes');
       recipesDiv.innerHTML = '';
-      if (createdRecipes.length === 0) {
-        recipesDiv.innerHTML = '<p>Нет созданных рецептов</p>';
-      } else {
-        createdRecipes.forEach(recipe => {
-          const recipeDiv = document.createElement('div');
-          recipeDiv.className = 'item';
-          recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
-          recipeDiv.title = recipe.name;
-          recipeDiv.addEventListener('click', () => {
-            alert(`Рецепт для ${recipe.name}: ${recipes[recipe.name].ingredients.join(' + ')}`);
-          });
-          recipesDiv.appendChild(recipeDiv);
+      Object.entries(recipes).forEach(([name, recipe]) => {
+        const recipeDiv = document.createElement('div');
+        recipeDiv.className = 'item';
+        recipeDiv.style.backgroundImage = `url('${recipe.image}')`;
+        recipeDiv.title = name;
+        recipeDiv.addEventListener('click', () => {
+          alert(`Рецепт для ${name}: ${recipe.ingredients.join(' + ')}`);
         });
-      }
+        recipesDiv.appendChild(recipeDiv);
+      });
     }
 
-    function selectItem(id) {
-      const selectedIndex = selectedItems.indexOf(id);
+    function selectItem(index) {
+      const selectedIndex = selectedItems.indexOf(index);
       if (selectedIndex >= 0) {
         selectedItems.splice(selectedIndex, 1);
       } else if (selectedItems.length < 4) {
-        selectedItems.push(id);
+        selectedItems.push(index);
       }
       document.getElementById('mix-button').disabled = selectedItems.length < 2;
       renderInventory();
@@ -205,14 +196,11 @@
     function mixItems() {
       if (selectedItems.length < 2) return;
 
-      const selected = selectedItems.map(id => {
-        const [type, index] = id.split('-');
-        return type === 'basic' ? basicInventory[index].name : createdInventory[index].name;
-      });
-
+      const selectedNames = selectedItems.map(index => inventory[index].name);
       let result = null;
+
       for (const [name, recipe] of Object.entries(recipes)) {
-        if (recipe.ingredients.every(ingredient => selected.includes(ingredient))) {
+        if (recipe.ingredients.every(ingredient => selectedNames.includes(ingredient))) {
           result = { name, image: recipe.image };
           break;
         }
@@ -222,21 +210,17 @@
       if (result) {
         resultDiv.innerHTML = `<h3>Создано: ${result.name}</h3><img src="${result.image}" alt="${result.name}" style="width:100px;">`;
 
-        const existing = createdInventory.find(item => item.name === result.name);
+        const existing = inventory.find(item => item.name === result.name);
         if (existing) {
           existing.count++;
         } else {
-          createdInventory.push({ name: result.name, image: result.image, count: 1 });
+          inventory.push({ name: result.name, image: result.image, count: 1 });
         }
 
-        selectedItems.forEach(id => {
-          const [type, index] = id.split('-');
-          const inventory = type === 'basic' ? basicInventory : createdInventory;
+        selectedItems.forEach(index => {
           inventory[index].count--;
           if (inventory[index].count === 0) inventory.splice(index, 1);
         });
-
-        renderRecipes();
       } else {
         resultDiv.innerHTML = '<h3>Ингредиенты не смешиваются!</h3>';
       }
@@ -249,6 +233,7 @@
     document.getElementById('mix-button').addEventListener('click', mixItems);
 
     renderInventory();
+    renderRecipes();
   </script>
 </body>
 </html>
